@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -462,14 +462,14 @@ function MobileApp() {
   const completeness = getCompleteness(activeProject);
   const pendingMetricCount = activeProject.surroundingMetrics.filter((metric) => metric.status !== '样例').length;
 
-  useEffect(() => {
-    if (selectedProjectId) {
-      setDraft(draftFromProject(selectedProject));
-    }
-  }, [selectedProjectId, projects]);
-
   function updateDraft(key, value) {
     setDraft((current) => ({ ...current, [key]: value }));
+  }
+
+  function selectProject(project) {
+    setSelectedProjectId(project.id);
+    setDraft(draftFromProject(project));
+    setNotice('');
   }
 
   function startCreate() {
@@ -487,6 +487,7 @@ function MobileApp() {
       : [nextProject, ...projects];
     setProjects(nextProjects);
     setSelectedProjectId(nextProject.id);
+    setDraft(draftFromProject(nextProject));
     saveMobileProjects(nextProjects);
     setNotice('已保存到本机浏览器。');
   }
@@ -494,8 +495,10 @@ function MobileApp() {
   function deleteSelectedProject() {
     if (!selectedProjectId) return;
     const nextProjects = projects.filter((project) => project.id !== selectedProjectId);
+    const nextProject = nextProjects[0];
     setProjects(nextProjects);
-    setSelectedProjectId(nextProjects[0]?.id || '');
+    setSelectedProjectId(nextProject?.id || '');
+    setDraft(nextProject ? draftFromProject(nextProject) : createBlankDraft());
     saveMobileProjects(nextProjects);
     setNotice('已删除当前项目。');
   }
@@ -503,6 +506,7 @@ function MobileApp() {
   function resetSamples() {
     setProjects(publicProjects);
     setSelectedProjectId(publicProjects[0].id);
+    setDraft(draftFromProject(publicProjects[0]));
     setCity('全部');
     setQuery('');
     saveMobileProjects(publicProjects);
@@ -544,7 +548,7 @@ function MobileApp() {
                 ? projects[0]
                 : projects.find((project) => project.city === item);
               if (nextProject) {
-                setSelectedProjectId(nextProject.id);
+                selectProject(nextProject);
               }
             }}
           >
@@ -596,7 +600,7 @@ function MobileApp() {
               className={`mobile-project-card ${activeProject.id === project.id ? 'active' : ''}`}
               key={project.id}
               type="button"
-              onClick={() => setSelectedProjectId(project.id)}
+              onClick={() => selectProject(project)}
             >
               <span>{project.city} · {project.district} · {project.projectType}</span>
               <strong>{project.title}</strong>
