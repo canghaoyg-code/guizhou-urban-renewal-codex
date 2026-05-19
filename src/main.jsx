@@ -6,7 +6,7 @@ import {
 } from 'recharts';
 import {
   Activity, CalendarDays, CheckCircle2, ClipboardCheck, Database, ExternalLink,
-  FileSearch, Filter, Link as LinkIcon, MapPin, Radar, RefreshCw
+  FileSearch, Filter, Link as LinkIcon, MapPin, Radar, RefreshCw, Smartphone
 } from 'lucide-react';
 import { futureModules, publicProjects, publicSources, sevenDayPlan } from './data/projectData';
 import './styles.css';
@@ -77,6 +77,10 @@ function App() {
             <p>核心接口：原文抽取</p>
             <p>下一步：现场补数</p>
           </div>
+          <a className="mobile-entry-link" href="/mobile.html">
+            <Smartphone size={17} />
+            打开移动端页面
+          </a>
         </div>
       </section>
 
@@ -323,4 +327,151 @@ function App() {
   );
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+function MobileApp() {
+  const [city, setCity] = useState('全部');
+  const [selectedProjectId, setSelectedProjectId] = useState(publicProjects[0].id);
+  const cities = ['全部', ...new Set(publicProjects.map((project) => project.city))];
+
+  const filtered = city === '全部'
+    ? publicProjects
+    : publicProjects.filter((project) => project.city === city);
+
+  const selectedProject = filtered.find((project) => project.id === selectedProjectId) || filtered[0] || publicProjects[0];
+  const selectedSource = getSource(selectedProject);
+  const completeness = getCompleteness(selectedProject);
+  const pendingMetricCount = selectedProject.surroundingMetrics.filter((metric) => metric.status !== '样例').length;
+
+  return (
+    <main className="mobile-app">
+      <header className="mobile-hero">
+        <p className="eyebrow">Mobile Project Dossier</p>
+        <h1>公示项目移动端</h1>
+        <p>手机上快速查看项目基础信息、周边数据和现场补数动作。</p>
+      </header>
+
+      <section className="mobile-summary">
+        <div>
+          <span>项目数</span>
+          <strong>{filtered.length}</strong>
+        </div>
+        <div>
+          <span>完整度</span>
+          <strong>{completeness}%</strong>
+        </div>
+        <div>
+          <span>待补数</span>
+          <strong>{pendingMetricCount}</strong>
+        </div>
+      </section>
+
+      <nav className="mobile-chip-row" aria-label="城市筛选">
+        {cities.map((item) => (
+          <button
+            className={city === item ? 'active' : ''}
+            key={item}
+            type="button"
+            onClick={() => {
+              setCity(item);
+              const nextProject = item === '全部'
+                ? publicProjects[0]
+                : publicProjects.find((project) => project.city === item);
+              if (nextProject) {
+                setSelectedProjectId(nextProject.id);
+              }
+            }}
+          >
+            {item}
+          </button>
+        ))}
+      </nav>
+
+      <section className="mobile-section">
+        <div className="mobile-section-title">
+          <FileSearch size={18} />
+          <h2>项目列表</h2>
+        </div>
+        <div className="mobile-project-stack">
+          {filtered.map((project) => (
+            <button
+              className={`mobile-project-card ${selectedProject.id === project.id ? 'active' : ''}`}
+              key={project.id}
+              type="button"
+              onClick={() => setSelectedProjectId(project.id)}
+            >
+              <span>{project.city} · {project.district} · {project.projectType}</span>
+              <strong>{project.title}</strong>
+              <small>{project.dataStatus} · 完整度 {getCompleteness(project)}%</small>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="mobile-section">
+        <div className="mobile-section-title">
+          <ClipboardCheck size={18} />
+          <h2>基础信息</h2>
+        </div>
+        <article className="mobile-detail-card">
+          <p className="tag">{selectedProject.currentStatus} · {selectedProject.disclosureDate}</p>
+          <h3>{selectedProject.title}</h3>
+          <p>{selectedProject.summary}</p>
+          <div className="mobile-info-list">
+            <span>来源：{selectedSource?.name}</span>
+            <span>主管：{selectedProject.ownerUnit}</span>
+            <span>地点：{selectedProject.address}</span>
+            <span>范围：{selectedProject.renewalScope}</span>
+          </div>
+          <a className="mobile-link-button" href={selectedProject.sourceUrl} target="_blank" rel="noreferrer">
+            打开公示来源
+            <ExternalLink size={15} />
+          </a>
+        </article>
+      </section>
+
+      <section className="mobile-section">
+        <div className="mobile-section-title">
+          <MapPin size={18} />
+          <h2>周边数据</h2>
+        </div>
+        <div className="mobile-metric-grid">
+          {selectedProject.surroundingMetrics.map((metric) => (
+            <div className="mobile-metric-card" key={metric.name}>
+              <span>{metric.name}</span>
+              <strong>{metric.value}{metric.unit}</strong>
+              <small>{metric.status} · {metric.source}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mobile-section">
+        <div className="mobile-section-title">
+          <CalendarDays size={18} />
+          <h2>7天行动</h2>
+        </div>
+        <div className="mobile-timeline">
+          {sevenDayPlan.map((day) => (
+            <article key={day.day}>
+              <div>D{day.day}</div>
+              <section>
+                <h3>{day.title}</h3>
+                <p>{day.output}</p>
+                <span>{day.interfaceName}</span>
+              </section>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function shouldRenderMobilePage() {
+  const params = new URLSearchParams(window.location.search);
+  return window.location.pathname.endsWith('/mobile.html')
+    || window.location.pathname.endsWith('/mobile')
+    || window.location.hash === '#mobile'
+    || params.get('view') === 'mobile';
+}
+
+createRoot(document.getElementById('root')).render(shouldRenderMobilePage() ? <MobileApp /> : <App />);
