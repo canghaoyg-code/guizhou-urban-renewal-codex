@@ -38,6 +38,12 @@ npm run dev
 http://127.0.0.1:5173/mobile.html
 ```
 
+公网访问地址：
+
+```text
+https://canghaoyg-code.github.io/guizhou-urban-renewal-codex/mobile.html
+```
+
 > Vite 新版本对 Node.js 版本有要求，建议使用 Node.js 20.19+ 或 22.12+。
 
 ## 项目结构
@@ -76,6 +82,7 @@ guizhou-urban-renewal-codex/
 
 6. **移动端页面**
    - 独立入口 `mobile.html`，用于手机竖屏查看项目基础信息、周边指标和7天行动清单。
+   - 支持在手机浏览器中新增、查询、编辑、删除项目，数据保存在本机浏览器。
 
 ## 下一步开发建议
 

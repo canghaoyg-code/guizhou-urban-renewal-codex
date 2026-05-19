@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -6,7 +6,8 @@ import {
 } from 'recharts';
 import {
   Activity, CalendarDays, CheckCircle2, ClipboardCheck, Database, ExternalLink,
-  FileSearch, Filter, Link as LinkIcon, MapPin, Radar, RefreshCw, Smartphone
+  FileSearch, Filter, Link as LinkIcon, MapPin, Plus, Radar, RefreshCw,
+  RotateCcw, Save, Smartphone, Trash2
 } from 'lucide-react';
 import { futureModules, publicProjects, publicSources, sevenDayPlan } from './data/projectData';
 import './styles.css';
@@ -18,6 +19,114 @@ function getSource(project) {
 function getCompleteness(project) {
   const match = project.baseInfo.find((item) => item.label === '资料完整度')?.value.match(/\d+/);
   return match ? Number(match[0]) : 0;
+}
+
+const MOBILE_STORAGE_KEY = 'guizhou-public-projects-v1';
+
+function loadMobileProjects() {
+  try {
+    const saved = window.localStorage.getItem(MOBILE_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : publicProjects;
+  } catch {
+    return publicProjects;
+  }
+}
+
+function saveMobileProjects(projects) {
+  window.localStorage.setItem(MOBILE_STORAGE_KEY, JSON.stringify(projects));
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function createBlankDraft() {
+  return {
+    title: '',
+    city: '贵阳',
+    district: '',
+    projectType: '',
+    disclosureDate: today(),
+    ownerUnit: '',
+    address: '',
+    currentStatus: '线索入库',
+    dataStatus: '手机端新增',
+    landUse: '',
+    renewalScope: '',
+    summary: '',
+    sourceUrl: '',
+    completeness: 30,
+    morningFlow: '',
+    vacancyRate: '',
+    competitors: '',
+    parkingSaturation: '',
+  };
+}
+
+function draftFromProject(project) {
+  const metricValue = (name) => project.surroundingMetrics.find((metric) => metric.name === name)?.value ?? '';
+
+  return {
+    title: project.title,
+    city: project.city,
+    district: project.district,
+    projectType: project.projectType,
+    disclosureDate: project.disclosureDate,
+    ownerUnit: project.ownerUnit,
+    address: project.address,
+    currentStatus: project.currentStatus,
+    dataStatus: project.dataStatus,
+    landUse: project.landUse,
+    renewalScope: project.renewalScope,
+    summary: project.summary,
+    sourceUrl: project.sourceUrl,
+    completeness: getCompleteness(project),
+    morningFlow: metricValue('早高峰人流'),
+    vacancyRate: metricValue('沿街空铺率'),
+    competitors: metricValue('500米竞品'),
+    parkingSaturation: metricValue('停车饱和度'),
+  };
+}
+
+function projectFromDraft(draft, existingProject) {
+  const title = draft.title.trim() || '未命名公示项目';
+  const ownerUnit = draft.ownerUnit.trim() || '待补充';
+  const currentStatus = draft.currentStatus.trim() || '线索入库';
+
+  return {
+    ...(existingProject || {}),
+    id: existingProject?.id || `mobile-${Date.now()}`,
+    sourceId: existingProject?.sourceId || 'mobile-local',
+    city: draft.city.trim() || '待补充',
+    district: draft.district.trim() || '待补充',
+    title,
+    projectType: draft.projectType.trim() || '待分类',
+    disclosureDate: draft.disclosureDate || today(),
+    ownerUnit,
+    address: draft.address.trim() || '待补充',
+    currentStatus,
+    dataStatus: draft.dataStatus.trim() || '手机端编辑',
+    landUse: draft.landUse.trim() || '待补充',
+    renewalScope: draft.renewalScope.trim() || '待补充',
+    summary: draft.summary.trim() || '待补充项目摘要。',
+    tags: existingProject?.tags || ['手机录入'],
+    sourceUrl: draft.sourceUrl.trim() || '#',
+    baseInfo: [
+      { label: '更新阶段', value: currentStatus },
+      { label: '责任单位', value: ownerUnit },
+      { label: '所属区县', value: `${draft.city || '待补充'} · ${draft.district || '待补充'}` },
+      { label: '项目类型', value: draft.projectType.trim() || '待分类' },
+      { label: '公示日期', value: draft.disclosureDate || today() },
+      { label: '资料完整度', value: `${Number(draft.completeness) || 0}%` },
+    ],
+    surroundingMetrics: [
+      { name: '早高峰人流', value: Number(draft.morningFlow) || 0, unit: '人/小时', status: '手机录入', source: '移动端' },
+      { name: '沿街空铺率', value: Number(draft.vacancyRate) || 0, unit: '%', status: '手机录入', source: '移动端' },
+      { name: '500米竞品', value: Number(draft.competitors) || 0, unit: '个', status: '手机录入', source: '移动端' },
+      { name: '停车饱和度', value: Number(draft.parkingSaturation) || 0, unit: '%', status: '手机录入', source: '移动端' },
+    ],
+    fieldTasks: existingProject?.fieldTasks || ['补充公示原文', '补充周边数据', '现场复核'],
+  };
 }
 
 function App() {
@@ -77,7 +186,7 @@ function App() {
             <p>核心接口：原文抽取</p>
             <p>下一步：现场补数</p>
           </div>
-          <a className="mobile-entry-link" href="/mobile.html">
+          <a className="mobile-entry-link" href="mobile.html">
             <Smartphone size={17} />
             打开移动端页面
           </a>
@@ -329,17 +438,65 @@ function App() {
 
 function MobileApp() {
   const [city, setCity] = useState('全部');
-  const [selectedProjectId, setSelectedProjectId] = useState(publicProjects[0].id);
-  const cities = ['全部', ...new Set(publicProjects.map((project) => project.city))];
+  const [query, setQuery] = useState('');
+  const [projects, setProjects] = useState(loadMobileProjects);
+  const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || publicProjects[0].id);
+  const [draft, setDraft] = useState(() => draftFromProject(projects[0] || publicProjects[0]));
+  const cities = ['全部', ...new Set(projects.map((project) => project.city))];
 
-  const filtered = city === '全部'
-    ? publicProjects
-    : publicProjects.filter((project) => project.city === city);
+  const filtered = projects.filter((project) => {
+    const cityMatch = city === '全部' || project.city === city;
+    const keyword = query.trim();
+    const queryMatch = !keyword || [project.title, project.address, project.ownerUnit, project.projectType]
+      .some((value) => value.includes(keyword));
+    return cityMatch && queryMatch;
+  });
 
-  const selectedProject = filtered.find((project) => project.id === selectedProjectId) || filtered[0] || publicProjects[0];
+  const selectedProject = projects.find((project) => project.id === selectedProjectId) || filtered[0] || projects[0] || publicProjects[0];
   const selectedSource = getSource(selectedProject);
   const completeness = getCompleteness(selectedProject);
   const pendingMetricCount = selectedProject.surroundingMetrics.filter((metric) => metric.status !== '样例').length;
+
+  useEffect(() => {
+    setDraft(draftFromProject(selectedProject));
+  }, [selectedProjectId, projects]);
+
+  function updateDraft(key, value) {
+    setDraft((current) => ({ ...current, [key]: value }));
+  }
+
+  function startCreate() {
+    const nextDraft = createBlankDraft();
+    setSelectedProjectId('');
+    setDraft(nextDraft);
+  }
+
+  function saveDraft() {
+    const existingProject = projects.find((project) => project.id === selectedProjectId);
+    const nextProject = projectFromDraft(draft, existingProject);
+    const nextProjects = existingProject
+      ? projects.map((project) => project.id === nextProject.id ? nextProject : project)
+      : [nextProject, ...projects];
+    setProjects(nextProjects);
+    setSelectedProjectId(nextProject.id);
+    saveMobileProjects(nextProjects);
+  }
+
+  function deleteSelectedProject() {
+    if (!selectedProjectId) return;
+    const nextProjects = projects.filter((project) => project.id !== selectedProjectId);
+    setProjects(nextProjects);
+    setSelectedProjectId(nextProjects[0]?.id || '');
+    saveMobileProjects(nextProjects);
+  }
+
+  function resetSamples() {
+    setProjects(publicProjects);
+    setSelectedProjectId(publicProjects[0].id);
+    setCity('全部');
+    setQuery('');
+    saveMobileProjects(publicProjects);
+  }
 
   return (
     <main className="mobile-app">
@@ -373,8 +530,8 @@ function MobileApp() {
             onClick={() => {
               setCity(item);
               const nextProject = item === '全部'
-                ? publicProjects[0]
-                : publicProjects.find((project) => project.city === item);
+                ? projects[0]
+                : projects.find((project) => project.city === item);
               if (nextProject) {
                 setSelectedProjectId(nextProject.id);
               }
@@ -384,6 +541,37 @@ function MobileApp() {
           </button>
         ))}
       </nav>
+
+      <section className="mobile-section">
+        <div className="mobile-section-title">
+          <Filter size={18} />
+          <h2>查询与操作</h2>
+        </div>
+        <input
+          className="mobile-search"
+          placeholder="搜索项目、地址、主管单位"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+        <div className="mobile-action-row">
+          <button type="button" onClick={startCreate}>
+            <Plus size={16} />
+            新增
+          </button>
+          <button type="button" onClick={saveDraft}>
+            <Save size={16} />
+            保存
+          </button>
+          <button type="button" onClick={deleteSelectedProject} disabled={!selectedProjectId}>
+            <Trash2 size={16} />
+            删除
+          </button>
+          <button type="button" onClick={resetSamples}>
+            <RotateCcw size={16} />
+            重置
+          </button>
+        </div>
+      </section>
 
       <section className="mobile-section">
         <div className="mobile-section-title">
@@ -403,6 +591,87 @@ function MobileApp() {
               <small>{project.dataStatus} · 完整度 {getCompleteness(project)}%</small>
             </button>
           ))}
+        </div>
+      </section>
+
+      <section className="mobile-section">
+        <div className="mobile-section-title">
+          <Save size={18} />
+          <h2>{selectedProjectId ? '编辑项目' : '新增项目'}</h2>
+        </div>
+        <div className="mobile-form-grid">
+          <label>
+            项目名称
+            <input value={draft.title} onChange={(event) => updateDraft('title', event.target.value)} />
+          </label>
+          <label>
+            城市
+            <input value={draft.city} onChange={(event) => updateDraft('city', event.target.value)} />
+          </label>
+          <label>
+            区县
+            <input value={draft.district} onChange={(event) => updateDraft('district', event.target.value)} />
+          </label>
+          <label>
+            项目类型
+            <input value={draft.projectType} onChange={(event) => updateDraft('projectType', event.target.value)} />
+          </label>
+          <label>
+            主管单位
+            <input value={draft.ownerUnit} onChange={(event) => updateDraft('ownerUnit', event.target.value)} />
+          </label>
+          <label>
+            地址
+            <input value={draft.address} onChange={(event) => updateDraft('address', event.target.value)} />
+          </label>
+          <label>
+            公示日期
+            <input type="date" value={draft.disclosureDate} onChange={(event) => updateDraft('disclosureDate', event.target.value)} />
+          </label>
+          <label>
+            资料完整度
+            <input type="number" min="0" max="100" value={draft.completeness} onChange={(event) => updateDraft('completeness', event.target.value)} />
+          </label>
+          <label>
+            当前状态
+            <input value={draft.currentStatus} onChange={(event) => updateDraft('currentStatus', event.target.value)} />
+          </label>
+          <label>
+            数据状态
+            <input value={draft.dataStatus} onChange={(event) => updateDraft('dataStatus', event.target.value)} />
+          </label>
+          <label>
+            土地/空间用途
+            <input value={draft.landUse} onChange={(event) => updateDraft('landUse', event.target.value)} />
+          </label>
+          <label>
+            来源链接
+            <input value={draft.sourceUrl} onChange={(event) => updateDraft('sourceUrl', event.target.value)} />
+          </label>
+          <label>
+            更新范围
+            <textarea rows="3" value={draft.renewalScope} onChange={(event) => updateDraft('renewalScope', event.target.value)} />
+          </label>
+          <label>
+            项目摘要
+            <textarea rows="4" value={draft.summary} onChange={(event) => updateDraft('summary', event.target.value)} />
+          </label>
+          <label>
+            早高峰人流
+            <input type="number" value={draft.morningFlow} onChange={(event) => updateDraft('morningFlow', event.target.value)} />
+          </label>
+          <label>
+            沿街空铺率
+            <input type="number" value={draft.vacancyRate} onChange={(event) => updateDraft('vacancyRate', event.target.value)} />
+          </label>
+          <label>
+            500米竞品
+            <input type="number" value={draft.competitors} onChange={(event) => updateDraft('competitors', event.target.value)} />
+          </label>
+          <label>
+            停车饱和度
+            <input type="number" value={draft.parkingSaturation} onChange={(event) => updateDraft('parkingSaturation', event.target.value)} />
+          </label>
         </div>
       </section>
 
