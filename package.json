@@ -1,6 +1,7 @@
 {
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "collect": "node scripts/collect-public-info.mjs",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0"
   },
@@ -9,7 +10,6 @@
     "typescript": "^5.9.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "recharts": "^3.0.0",
     "lucide-react": "^0.468.0"
   },
   "devDependencies": {}

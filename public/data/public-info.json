@@ -1,0 +1,192 @@
+{
+  "lastUpdated": "2026-05-19T07:43:38.141Z",
+  "projectSources": [
+    {
+      "id": "gz-ggzy",
+      "name": "贵州省公共资源交易中心",
+      "url": "https://ggzy.guizhou.gov.cn/",
+      "scope": "招标公告、中标结果、变更公告",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gy-ggzy",
+      "name": "贵阳市公共资源交易中心",
+      "url": "https://ggzy.guiyang.gov.cn/",
+      "scope": "工程建设、政府采购、公示公告",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gz-housing",
+      "name": "贵州省住房和城乡建设厅",
+      "url": "https://zfcxjst.guizhou.gov.cn/",
+      "scope": "城市更新、老旧小区、住建公示",
+      "cadence": "每日自动抓取"
+    }
+  ],
+  "policySources": [
+    {
+      "id": "gz-gov-policy",
+      "name": "贵州省人民政府政策文件",
+      "url": "https://www.guizhou.gov.cn/zwgk/zcwj/",
+      "scope": "省级政策、通知、实施意见",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gz-housing-policy",
+      "name": "贵州省住房和城乡建设厅政策",
+      "url": "https://zfcxjst.guizhou.gov.cn/zwgk/xxgkml/zcwj/",
+      "scope": "住建领域政策、规范、通知",
+      "cadence": "每日自动抓取"
+    }
+  ],
+  "projects": [
+    {
+      "id": "gy-yunyan-community-renewal",
+      "title": "云岩区老旧小区配套设施更新项目",
+      "sourceName": "贵阳市住房和城乡建设局",
+      "sourceUrl": "https://zfcxjsj.guiyang.gov.cn/",
+      "city": "贵阳",
+      "district": "云岩区",
+      "projectType": "老旧小区更新",
+      "disclosureDate": "2026-05-12",
+      "ownerUnit": "云岩区住房和城乡建设局",
+      "address": "贵阳市云岩区毓秀路、威清路周边",
+      "currentStatus": "公示中",
+      "landUse": "居住 / 社区配套",
+      "renewalScope": "道路、排水、照明、便民服务点、公共空间微更新",
+      "summary": "项目覆盖成熟居住片区，当前页面只保留项目基础档案，用于判断是否值得进入后续人工核验。",
+      "details": [
+        {
+          "label": "实施主体",
+          "value": "云岩区住房和城乡建设局"
+        },
+        {
+          "label": "建设地点",
+          "value": "毓秀路、威清路周边成熟社区"
+        },
+        {
+          "label": "建设内容",
+          "value": "小区道路、排水、照明、公共空间与便民服务设施更新"
+        },
+        {
+          "label": "当前阶段",
+          "value": "方案公示"
+        },
+        {
+          "label": "资料状态",
+          "value": "基础字段已整理，待核对公示原文附件"
+        }
+      ]
+    },
+    {
+      "id": "gy-nanming-street-renewal",
+      "title": "南明区背街小巷环境整治与运营维护项目",
+      "sourceName": "贵阳市公共资源交易中心",
+      "sourceUrl": "https://ggzy.guiyang.gov.cn/",
+      "city": "贵阳",
+      "district": "南明区",
+      "projectType": "背街小巷更新",
+      "disclosureDate": "2026-05-08",
+      "ownerUnit": "南明区综合行政执法局",
+      "address": "贵阳市南明区花果园、湘雅片区",
+      "currentStatus": "采购公告",
+      "landUse": "商业 / 居住混合",
+      "renewalScope": "街面整治、照明、摊位秩序、垃圾收运、慢行空间",
+      "summary": "项目以街巷环境和运营维护为主，适合作为每日公示线索的标准化基础信息样本。",
+      "details": [
+        {
+          "label": "实施主体",
+          "value": "南明区综合行政执法局"
+        },
+        {
+          "label": "服务范围",
+          "value": "花果园、湘雅片区背街小巷"
+        },
+        {
+          "label": "建设内容",
+          "value": "街面秩序、照明、垃圾收运、慢行空间与日常运营维护"
+        },
+        {
+          "label": "当前阶段",
+          "value": "采购公告"
+        },
+        {
+          "label": "资料状态",
+          "value": "基础字段已整理，待补充项目编号和采购文件链接"
+        }
+      ]
+    },
+    {
+      "id": "zunyi-oldtown-parking",
+      "title": "遵义老城公共停车设施改造项目",
+      "sourceName": "贵州省公共资源交易中心",
+      "sourceUrl": "https://ggzy.guizhou.gov.cn/",
+      "city": "遵义",
+      "district": "红花岗区",
+      "projectType": "公共设施更新",
+      "disclosureDate": "2026-05-03",
+      "ownerUnit": "遵义市红花岗区城市管理局",
+      "address": "遵义市红花岗区老城核心片区",
+      "currentStatus": "线索入库",
+      "landUse": "公共服务 / 交通设施",
+      "renewalScope": "小型停车场、错峰停车、道闸、慢充设施、导视系统",
+      "summary": "项目保留为公共设施更新类样本，等待每日抓取任务补充真实公告详情。",
+      "details": [
+        {
+          "label": "实施主体",
+          "value": "遵义市红花岗区城市管理局"
+        },
+        {
+          "label": "建设地点",
+          "value": "红花岗区老城核心片区"
+        },
+        {
+          "label": "建设内容",
+          "value": "停车点改造、错峰停车组织、道闸与导视系统"
+        },
+        {
+          "label": "当前阶段",
+          "value": "线索入库"
+        },
+        {
+          "label": "资料状态",
+          "value": "待抓取原文并核对权属边界"
+        }
+      ]
+    }
+  ],
+  "policies": [
+    {
+      "id": "gz-urban-renewal-policy",
+      "title": "贵州省城市更新相关政策线索",
+      "sourceName": "贵州省人民政府",
+      "sourceUrl": "https://www.guizhou.gov.cn/zwgk/zcwj/",
+      "publishDate": "2026-05-10",
+      "issuingBody": "贵州省人民政府及相关部门",
+      "policyLevel": "省级政策",
+      "topic": "城市更新",
+      "summary": "用于跟踪城市更新、老旧小区、公共服务设施补短板等政策方向，为项目线索判断提供政策依据。",
+      "keyPoints": [
+        "关注城市更新、老旧小区、公共服务设施补短板等关键词。",
+        "每日抓取政策页面后保留标题、发布日期、发布单位和原文链接。",
+        "后续可按政策主题反向匹配项目类型。"
+      ]
+    },
+    {
+      "id": "gz-housing-policy-line",
+      "title": "贵州省住房城乡建设领域政策线索",
+      "sourceName": "贵州省住房和城乡建设厅",
+      "sourceUrl": "https://zfcxjst.guizhou.gov.cn/",
+      "publishDate": "2026-05-09",
+      "issuingBody": "贵州省住房和城乡建设厅",
+      "policyLevel": "部门政策",
+      "topic": "住建 / 公共空间 / 老旧小区",
+      "summary": "用于沉淀住建领域与城市更新、社区配套、公共空间改造相关的政策文件。",
+      "keyPoints": [
+        "优先收集标题中包含城市更新、老旧小区、完整社区、公共设施的政策。",
+        "政策详情页保留原文链接，便于人工复核。",
+        "页面只展示政策详情，不做资金预算判断。"
+      ]
+    }
+  ]
+}
