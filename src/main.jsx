@@ -442,6 +442,7 @@ function MobileApp() {
   const [projects, setProjects] = useState(loadMobileProjects);
   const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || publicProjects[0].id);
   const [draft, setDraft] = useState(() => draftFromProject(projects[0] || publicProjects[0]));
+  const [notice, setNotice] = useState('');
   const cities = ['全部', ...new Set(projects.map((project) => project.city))];
 
   const filtered = projects.filter((project) => {
@@ -453,12 +454,18 @@ function MobileApp() {
   });
 
   const selectedProject = projects.find((project) => project.id === selectedProjectId) || filtered[0] || projects[0] || publicProjects[0];
-  const selectedSource = getSource(selectedProject);
-  const completeness = getCompleteness(selectedProject);
-  const pendingMetricCount = selectedProject.surroundingMetrics.filter((metric) => metric.status !== '样例').length;
+  const isCreating = !selectedProjectId;
+  const activeProject = isCreating
+    ? projectFromDraft(draft, { id: 'draft-preview', sourceId: 'mobile-local', tags: ['手机录入'] })
+    : selectedProject;
+  const selectedSource = getSource(activeProject);
+  const completeness = getCompleteness(activeProject);
+  const pendingMetricCount = activeProject.surroundingMetrics.filter((metric) => metric.status !== '样例').length;
 
   useEffect(() => {
-    setDraft(draftFromProject(selectedProject));
+    if (selectedProjectId) {
+      setDraft(draftFromProject(selectedProject));
+    }
   }, [selectedProjectId, projects]);
 
   function updateDraft(key, value) {
@@ -469,6 +476,7 @@ function MobileApp() {
     const nextDraft = createBlankDraft();
     setSelectedProjectId('');
     setDraft(nextDraft);
+    setNotice('正在新增项目，填写后点保存。');
   }
 
   function saveDraft() {
@@ -480,6 +488,7 @@ function MobileApp() {
     setProjects(nextProjects);
     setSelectedProjectId(nextProject.id);
     saveMobileProjects(nextProjects);
+    setNotice('已保存到本机浏览器。');
   }
 
   function deleteSelectedProject() {
@@ -488,6 +497,7 @@ function MobileApp() {
     setProjects(nextProjects);
     setSelectedProjectId(nextProjects[0]?.id || '');
     saveMobileProjects(nextProjects);
+    setNotice('已删除当前项目。');
   }
 
   function resetSamples() {
@@ -496,6 +506,7 @@ function MobileApp() {
     setCity('全部');
     setQuery('');
     saveMobileProjects(publicProjects);
+    setNotice('已恢复样例数据。');
   }
 
   return (
@@ -571,6 +582,7 @@ function MobileApp() {
             重置
           </button>
         </div>
+        {notice && <p className="mobile-notice">{notice}</p>}
       </section>
 
       <section className="mobile-section">
@@ -581,7 +593,7 @@ function MobileApp() {
         <div className="mobile-project-stack">
           {filtered.map((project) => (
             <button
-              className={`mobile-project-card ${selectedProject.id === project.id ? 'active' : ''}`}
+              className={`mobile-project-card ${activeProject.id === project.id ? 'active' : ''}`}
               key={project.id}
               type="button"
               onClick={() => setSelectedProjectId(project.id)}
@@ -681,16 +693,16 @@ function MobileApp() {
           <h2>基础信息</h2>
         </div>
         <article className="mobile-detail-card">
-          <p className="tag">{selectedProject.currentStatus} · {selectedProject.disclosureDate}</p>
-          <h3>{selectedProject.title}</h3>
-          <p>{selectedProject.summary}</p>
+          <p className="tag">{activeProject.currentStatus} · {activeProject.disclosureDate}</p>
+          <h3>{activeProject.title}</h3>
+          <p>{activeProject.summary}</p>
           <div className="mobile-info-list">
-            <span>来源：{selectedSource?.name}</span>
-            <span>主管：{selectedProject.ownerUnit}</span>
-            <span>地点：{selectedProject.address}</span>
-            <span>范围：{selectedProject.renewalScope}</span>
+            <span>来源：{selectedSource?.name || '手机本地'}</span>
+            <span>主管：{activeProject.ownerUnit}</span>
+            <span>地点：{activeProject.address}</span>
+            <span>范围：{activeProject.renewalScope}</span>
           </div>
-          <a className="mobile-link-button" href={selectedProject.sourceUrl} target="_blank" rel="noreferrer">
+          <a className="mobile-link-button" href={activeProject.sourceUrl} target="_blank" rel="noreferrer">
             打开公示来源
             <ExternalLink size={15} />
           </a>
@@ -703,7 +715,7 @@ function MobileApp() {
           <h2>周边数据</h2>
         </div>
         <div className="mobile-metric-grid">
-          {selectedProject.surroundingMetrics.map((metric) => (
+          {activeProject.surroundingMetrics.map((metric) => (
             <div className="mobile-metric-card" key={metric.name}>
               <span>{metric.name}</span>
               <strong>{metric.value}{metric.unit}</strong>
