@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+dashboard-preview.png
+public-notice-dashboard-preview.png
