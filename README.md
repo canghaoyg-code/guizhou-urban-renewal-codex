@@ -14,7 +14,7 @@ npm run collect
 npm run build
 ```
 
-采集结果写入：
+采集源覆盖省级、市级、区县级和新闻会议类入口，包括公共资源交易、住建公示、区县通知公告、政府新闻、会议动态、发改委政务要闻等。采集结果写入：
 
 ```text
 public/data/public-info.json

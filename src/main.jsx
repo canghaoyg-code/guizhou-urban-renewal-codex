@@ -42,7 +42,7 @@ function App() {
   useEffect(() => {
     let active = true;
 
-    fetch('./data/public-info.json', { cache: 'no-store' })
+    fetch(`./data/public-info.json?t=${Date.now()}`, { cache: 'no-store' })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);

@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-05-19T07:43:38.141Z",
+  "lastUpdated": "2026-05-19T08:23:52.445Z",
   "projectSources": [
     {
       "id": "gz-ggzy",
@@ -21,6 +21,55 @@
       "url": "https://zfcxjst.guizhou.gov.cn/",
       "scope": "城市更新、老旧小区、住建公示",
       "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gy-gov-notice",
+      "name": "贵阳市人民政府公示公告",
+      "url": "https://www.guiyang.gov.cn/zwgk/",
+      "scope": "市级公告、区县公告转载、项目线索",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gy-gov-news",
+      "name": "贵阳市人民政府政务动态",
+      "url": "https://www.guiyang.gov.cn/zwgk/zwgkxwdt/",
+      "scope": "会议、调研、推进会、部门动态",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "huaxi-notice",
+      "name": "花溪区人民政府通知公告",
+      "url": "https://www.huaxi.gov.cn/xwzx/tzgg/",
+      "scope": "批前公示、划拨公示、城中村改造公告",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "huaxi-news",
+      "name": "花溪区人民政府新闻动态",
+      "url": "https://www.huaxi.gov.cn/xwzx/hxyw/",
+      "scope": "区级会议、部门动态、街区更新线索",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "yunyan-gov",
+      "name": "云岩区人民政府门户",
+      "url": "https://www.yunyan.gov.cn/",
+      "scope": "老城更新、三马片区、区级公告和新闻",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "nanming-gov",
+      "name": "南明区人民政府门户",
+      "url": "https://www.nanming.gov.cn/",
+      "scope": "背街小巷、片区更新、区级公告和新闻",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "guanshanhu-gov",
+      "name": "观山湖区人民政府门户",
+      "url": "https://www.guanshanhu.gov.cn/",
+      "scope": "新区配套、公共服务、区级公告和新闻",
+      "cadence": "每日自动抓取"
     }
   ],
   "policySources": [
@@ -36,6 +85,41 @@
       "name": "贵州省住房和城乡建设厅政策",
       "url": "https://zfcxjst.guizhou.gov.cn/zwgk/xxgkml/zcwj/",
       "scope": "住建领域政策、规范、通知",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gy-gov-policy",
+      "name": "贵阳市人民政府政策文件",
+      "url": "https://www.guiyang.gov.cn/zwgk/zcwj/",
+      "scope": "市级政策、规范性文件、实施方案",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gy-gov-meeting",
+      "name": "贵阳市人民政府会议动态",
+      "url": "https://www.guiyang.gov.cn/zwgk/zwgkxwdt/",
+      "scope": "政府会议、专题会、工作推进会",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gz-gov-news",
+      "name": "贵州省人民政府新闻动态",
+      "url": "https://www.guizhou.gov.cn/home/gzyw/",
+      "scope": "省级会议、新闻发布、政策趋势",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "gz-drc-news",
+      "name": "贵州省发展改革委政务要闻",
+      "url": "https://drc.guizhou.gov.cn/xwzx/zwyw/",
+      "scope": "项目谋划、城镇化、投资和会议线索",
+      "cadence": "每日自动抓取"
+    },
+    {
+      "id": "huaxi-policy",
+      "name": "花溪区人民政府政策文件",
+      "url": "https://www.huaxi.gov.cn/zwgkgb/",
+      "scope": "区级政策、政府公报、征求意见",
       "cadence": "每日自动抓取"
     }
   ],

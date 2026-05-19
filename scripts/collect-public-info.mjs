@@ -4,8 +4,51 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dataPath = resolve(rootDir, 'public/data/public-info.json');
-const projectKeywords = ['项目', '公示', '公告', '招标', '采购', '中标', '城市更新', '老旧小区', '改造'];
-const policyKeywords = ['政策', '通知', '办法', '意见', '方案', '城市更新', '老旧小区', '住建'];
+const projectKeywords = [
+  '项目',
+  '公示',
+  '公告',
+  '招标',
+  '采购',
+  '中标',
+  '批前',
+  '划拨',
+  '征收',
+  '收回',
+  '规划',
+  '城市更新',
+  '老旧小区',
+  '城中村',
+  '背街小巷',
+  '改造',
+  '更新',
+  '基础设施',
+  '配套设施',
+  '停车',
+  '一圈两场三改',
+  '会议',
+  '推进会',
+  '调研',
+];
+const policyKeywords = [
+  '政策',
+  '通知',
+  '办法',
+  '意见',
+  '方案',
+  '规划',
+  '会议',
+  '推进会',
+  '专题会',
+  '调研',
+  '新闻发布',
+  '城市更新',
+  '老旧小区',
+  '城中村',
+  '住建',
+  '城镇化',
+  '公共服务',
+];
 
 function compactText(value) {
   return String(value || '')
@@ -56,8 +99,12 @@ function extractLinks(html, baseUrl, keywords) {
 }
 
 async function fetchSource(source, keywords) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
   try {
     const response = await fetch(source.url, {
+      signal: controller.signal,
       headers: {
         'user-agent': 'Mozilla/5.0 public-info-collector/1.0',
       },
@@ -70,6 +117,8 @@ async function fetchSource(source, keywords) {
     }));
   } catch {
     return [];
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
