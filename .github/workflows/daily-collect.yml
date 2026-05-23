@@ -1,6 +1,9 @@
 name: Daily public information collect
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     - cron: '0 1 * * *'
   workflow_dispatch:
